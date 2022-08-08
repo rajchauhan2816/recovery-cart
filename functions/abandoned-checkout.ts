@@ -20,7 +20,19 @@ export async function handleAbandonCheckoutRequest(request: Request) {
   } catch (_) {
     return json({ error: "Invalid body" }, { status: 400 });
   }
+  // get abandoned_checkout_id from abandoned_checkouts table
+  const { data: checkoutData } = await supabaseClient
+    .from(
+      "abandoned_checkouts",
+    )
+    .select("id")
+    .eq("token", dto.token)
+    .single();
+  if (checkoutData) {
+    return json({ message: "Checkout already exists" });
+  }
 
+  // insert into abandoned_checkouts table
   const { data, error } = await supabaseClient.from("abandoned_checkouts")
     .insert({
       recovery_url: dto.abandoned_checkout_url,
@@ -34,6 +46,7 @@ export async function handleAbandonCheckoutRequest(request: Request) {
     return json({ error: error.message }, { status: 500 });
   }
 
+  //Add Notification to Queue
   await addNotificationToQueue({
     abandoned_checkout_id: data.id,
     email: data.email,

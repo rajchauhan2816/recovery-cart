@@ -121,6 +121,6 @@ POST http://localhost:8000/abandoncheckout
   "total_price": "409.94",
   "total_tax": "11.94",
   "total_weight": 400,
-  "updated_at": "2012-08-24T14:02:15-04:00",
+  "updated_at": "2022-08-08T11:30:34.890Z",
   "user_id": 1
 }

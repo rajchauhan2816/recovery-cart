@@ -1,6 +1,7 @@
 import { NotificationDto } from "./../dto/notification.dto.ts";
 import { supabaseClient } from "./../supabaseClient.ts";
 import { cron } from "https://deno.land/x/deno_cron@v1.0.0/cron.ts";
+import { addDays } from "../utils/date.ts";
 export async function addNotificationToQueue(dto: NotificationDto) {
   await supabaseClient.from("notifications")
     .insert({
@@ -15,25 +16,27 @@ export async function removeNotificationToQueue(abandonedCheckoutId: string) {
     .eq("abandoned_checkout_id", abandonedCheckoutId);
 }
 
-const sendNotification = async (notification: any) => {
+const sendNotification = (notification: any, abandonedCheckout: any) => {
+  // send notification to user
+  console.log("Email Sent Successfully", notification.email);
+  console.log("notification", notification);
+  console.log("abandoned_checkouts", abandonedCheckout);
+};
+
+const getAbandonedCheckout = async (abandonedCheckoutId: string) => {
   const { data, error } = await supabaseClient
     .from(
       "abandoned_checkouts",
     )
     .select("*")
-    .eq("id", notification.abandoned_checkout_id)
+    .eq("id", abandonedCheckoutId)
     .single();
   if (error) {
     console.log(error);
     return;
   }
-
-  // send notification to user
-  console.log("Email Sent Successfully", notification.email);
-  console.log("notification", notification);
-  console.log("abandoned_checkouts", data);
+  return data;
 };
-
 const notificationWorker = async () => {
   // get notication from notifications table
   // get current date in utc
@@ -47,27 +50,42 @@ const notificationWorker = async () => {
   }
   data?.forEach(async (notification) => {
     if (notification.retry_count < 3) {
+      const abandonedCheckout = await getAbandonedCheckout(
+        notification.abandoned_checkout_id,
+      );
       // send notification
-      sendNotification(notification);
+      sendNotification(notification, abandonedCheckout);
+
+      let time_to_send;
+      // 0 means 30 minutes notification is sent.
+      if (notification.retry_count == 0) {
+        time_to_send = addDays(new Date(abandonedCheckout.updated_at), 1);
+      } else if (notification.retry_count == 1) {
+        // 1 means 1 day notification is sent.
+        time_to_send = addDays(new Date(abandonedCheckout.updated_at), 3);
+      } else if (notification.retry_count === 2) {
+        // 2 means 3 day notification is sent.
+        // remove notification from notifications table
+        return await removeNotificationToQueue(
+          notification.abandoned_checkout_id,
+        );
+      }
       // update retry_count
       await supabaseClient.from("notifications")
         .update({
           retry_count: notification.retry_count + 1,
+          time_to_send,
         })
         .eq("id", notification.id);
-
-      if (notification.retry_count === 2) {
-        // remove notification from notifications table
-        await removeNotificationToQueue(notification.abandoned_checkout_id);
-      }
+    } else {
+      // remove notification from notifications table
+      await removeNotificationToQueue(notification.abandoned_checkout_id);
     }
-    // remove notification from queue
-    await removeNotificationToQueue(notification.abandoned_checkout_id);
   });
 };
 
 // Run Job in every 5 seconds
-cron("5 * * * * *", () => {
+cron("*/5 * * * * *", () => {
   console.log("Notification Worker is Working", new Date());
   notificationWorker();
 });
