@@ -38,7 +38,7 @@ export async function handleAbandonCheckoutRequest(request: Request) {
     abandoned_checkout_id: data.id,
     email: data.email,
     time_to_send: addMinutes(new Date(Date.parse(dto.updated_at)), 30),
-    retry_count: 1,
+    retry_count: 0,
   });
 
   return json({ message: "Success" });
