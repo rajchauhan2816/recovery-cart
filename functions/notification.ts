@@ -86,6 +86,6 @@ const notificationWorker = async () => {
 
 // Run Job in every 5 seconds
 cron("*/5 * * * * *", () => {
-  console.log("Notification Worker is Working", new Date());
+  console.info("Notification Worker is Working", new Date());
   notificationWorker();
 });
