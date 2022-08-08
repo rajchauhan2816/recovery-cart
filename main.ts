@@ -1,13 +1,8 @@
-import { serve, json } from "https://deno.land/x/sift@0.5.0/mod.ts";
+import { serve } from "https://deno.land/x/sift@0.5.0/mod.ts";
+import { handleAbandonCheckoutRequest } from "./functions/abandoned-checkout.ts";
+import { handleOrderRequest } from "./functions/order.ts";
 
 serve({
-    "/": () => json({ message: "hello world" }),
-    "/api/create": (req) => {
-
-        if (req.method !== 'POST') {
-            return json({ message: "Only POST requests are allowed" }, { status: 405 });
-        }
-
-        return json({ message: "created" }, { status: 201 })
-    },
-  });
+  "/abandoncheckout": handleAbandonCheckoutRequest,
+  "/order": handleOrderRequest,
+});
