@@ -55,7 +55,7 @@ POST http://localhost:8000/abandoncheckout
       }
     }
   ],
-  "email": "bob.norman@mail.example.com",
+  "email": "raj@gmail.com",
   "gateway": "authorize_net",
   "id": 450789469,
   "landing_site": "http://www.example.com?source=abc",
@@ -114,7 +114,7 @@ POST http://localhost:8000/abandoncheckout
     "channel_liable": true
   },
   "taxes_included": false,
-  "token": "b1946ac92492d2347c6235b4d2611184",
+  "token": "b1946ac92492d2347c6235b4d2611185",
   "total_discounts": "0.00",
   "total_duties": "105.31",
   "total_line_items_price": "398.00",

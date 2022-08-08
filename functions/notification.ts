@@ -16,7 +16,14 @@ export async function removeNotificationToQueue(abandonedCheckoutId: string) {
     .eq("abandoned_checkout_id", abandonedCheckoutId);
 }
 
-const sendNotification = (notification: any, abandonedCheckout: any) => {
+const sendNotification = async (notification: any, abandonedCheckout: any) => {
+  // insert in sent_notifications table
+  await supabaseClient.from("sent_notifications")
+    .insert({
+      abandoned_checkout_id: abandonedCheckout.id,
+      email: notification.email,
+      created_at: new Date(),
+    });
   // send notification to user
   console.log("Email Sent Successfully", notification.email);
   console.log("notification", notification);

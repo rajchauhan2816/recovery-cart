@@ -79,7 +79,7 @@ POST http://localhost:8000/order
         "type": "fixed_amount"
       }
     ],
-    "email": "bob.norman@mail.example.com",
+    "email": "raj@gmail.com",
     "estimated_taxes": false,
     "financial_status": "partially_refunded",
     "fulfillment_status": null,
@@ -147,7 +147,7 @@ POST http://localhost:8000/order
     ],
     "taxes_included": false,
     "test": false,
-    "token": "b1946ac92492d2347c6235b4d2611184",
+    "token": "b1946ac92492d2347c6235b4d2611185",
     "total_discounts": "10.00",
     "total_discounts_set": {
       "shop_money": {
