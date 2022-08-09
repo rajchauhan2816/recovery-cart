@@ -29,14 +29,16 @@ function App({ notificationList }) {
                             <th>Email</th>
                             <th>Recovery URL</th>
                             <th>Token</th>
+                            <th>Sent at</th>
                             <th>Recovered at</th>
                         </tr>
                         {notificationList.map((notification) => (
                             <div>
                                 <tr>
-                                    <td>{notification.email} | </td>
-                                    <td>{notification.abandoned_checkouts.recovery_url} | </td>
-                                    <td>{notification.abandoned_checkouts.token} | </td>
+                                    <td>{notification.email}</td>
+                                    <td>{notification.abandoned_checkouts.recovery_url}</td>
+                                    <td>{notification.abandoned_checkouts.token}</td>
+                                    <td>{formatDate(notification.created_at)}</td>
                                     <td>{formatDate(notification.abandoned_checkouts.recovered_at) || "None"}</td>
                                 </tr>
                             </div>
